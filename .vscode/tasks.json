@@ -1,0 +1,33 @@
+{
+  // PathSnap demo tasks. Run with Cmd/Ctrl+Shift+P -> "Tasks: Run Task".
+  // "PathSnap API (backend)" also starts automatically when this folder opens
+  // (VS Code asks once: "Allow automatic tasks" -> Allow).
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PathSnap API (backend)",
+      "type": "shell",
+      "command": "HOST=0.0.0.0 scripts/demo_api.sh",
+      "windows": { "command": "$env:HOST='0.0.0.0'; $env:PATHSNAP_DATA_DIR='..\\evaluator_data\\evaluator_test'; .venv\\Scripts\\uvicorn api.main:app --host 0.0.0.0 --port 8000" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "focus": true, "panel": "dedicated", "clear": true },
+      "runOptions": { "runOn": "folderOpen" }
+    },
+    {
+      "label": "PathSnap UI (single-laptop rehearsal)",
+      "type": "shell",
+      "command": "scripts/demo_ui.sh http://localhost:8000",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "PathSnap tests (leak test)",
+      "type": "shell",
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest -q tests",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new" }
+    }
+  ]
+}
