@@ -17,7 +17,7 @@ PathSnap matches noisy GPS trajectories to a directed road network. The pipeline
 | Metrics | `docs/evaluation_protocol.md` |
 | Features | `docs/features.md` |
 | Report tables (generated) | `reports/report_tables.md` |
-| Report draft | `reports/REPORT_DRAFT.md` |
+| **Technical report (PDF)** | `reports/PathSnap_Team26_Report.pdf` |
 
 ## Results (student-test, 10 trips)
 
@@ -90,7 +90,16 @@ python -m pytest -q tests            # API tests, including the ground-truth lea
 - At inference the API never reads `.route`. It scores server-side after prediction and returns aggregate metrics only. `tests/test_api.py` checks this.
 
 ## Team and contributions
-_Fill in: member, areas owned, areas reviewed._
+**Team 26** (UE24CS352A Machine Learning, PES University, RR Campus)
+
+| Name | SRN |
+|---|---|
+| Aryan Shashank Musale | PES1UG24CS085 |
+| Aryan Singh | PES1UG24CS086 |
+| Bharat V Bhat | PES1UG24CS113 |
+| Bharath Hegde | PES1UG24CS114 |
+
+Technical report: `reports/PathSnap_Team26_Report.pdf` (source `reports/PathSnap_Report.md`, rebuilt with `python -m pathsnap.report_pdf`).
 
 ## AI-use disclosure
 The following were drafted with an AI assistant (Claude, Anthropic):

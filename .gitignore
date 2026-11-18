@@ -13,3 +13,4 @@ artifacts/candidates/random_forest.joblib
 artifacts/candidates/extra_trees.joblib
 artifacts/candidates/knn.joblib
 .pytest_cache/
+reports/PathSnap_Report.html

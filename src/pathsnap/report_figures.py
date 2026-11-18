@@ -155,9 +155,31 @@ def hmm():
     fig.tight_layout(); fig.savefig(FIG / "hmm_grid_train.png", dpi=150); plt.close(fig)
 
 
+def evaluator():
+    """Evaluator-test (one test-only run): untuned vs tuned, classifier only vs + HMM, per trip."""
+    d = REPO_ROOT / "experiments" / "evaluator_test_final"
+    t = pd.read_csv(d / "per_trip.csv", dtype={"trip_id": str})
+    u = pd.read_csv(d / "per_trip_untuned_reference.csv", dtype={"trip_id": str})
+    x = np.arange(len(t)); bw = .2
+    fig, ax = plt.subplots(1, 2, figsize=(17, 4.8))
+    ax[0].bar(x - 1.5 * bw, u.top1_classifier_only, bw, label="untuned, classifier only", color="#9ECAE9")
+    ax[0].bar(x - .5 * bw, t.top1_classifier_only, bw, label="tuned, classifier only", color="#4C78A8")
+    ax[0].bar(x + .5 * bw, u.top1_hmm, bw, label="untuned + HMM", color="#FF9DA6")
+    ax[0].bar(x + 1.5 * bw, t.top1_hmm, bw, label="tuned + HMM (final)", color="#D62728")
+    ax[0].set_ylim(.8, 1.06); ax[0].set_title("Evaluator-test Top-1 per trip"); ax[0].legend(fontsize=8, loc="upper left", ncol=4)
+    ax[1].bar(x - bw / 2, u.route_f1, bw, label="untuned + HMM", color="#FF9DA6")
+    ax[1].bar(x + bw / 2, t.route_f1, bw, label="tuned + HMM (final)", color="#D62728")
+    ax[1].set_ylim(.7, 1.06); ax[1].set_title("Evaluator-test route F1 per trip"); ax[1].legend(fontsize=8, loc="upper left", ncol=2)
+    for a in ax:
+        a.set_xticks(x, [s[-2:] for s in t.trip_id]); a.set_xlabel("evaluator trip (last 2 digits)")
+    fig.tight_layout(); fig.savefig(FIG / "evaluator_test_final.png", dpi=150); plt.close(fig)
+
+
 def main(what="all"):
     FIG.mkdir(parents=True, exist_ok=True)
     cfg = load_config()
+    if what in ("evaluator", "all"):
+        evaluator()
     if what in ("eda", "all"):
         eda(cfg)
     if what in ("models", "all"):
