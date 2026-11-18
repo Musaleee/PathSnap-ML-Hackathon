@@ -1,0 +1,25 @@
+              trips     gps  nodes_median  arcs_median
+partition                                             
+student_test     10   19160        6596.5      13145.0
+train            80  208417        9608.0      19526.5
+
+Trips with invariant issues: 9
+Trips with large gaps (> 10.0 s): 42
+Overall fraction of 1 s steps (point-weighted): 0.967
+Trips with duplicate timestamps: 0, backwards timestamps: 0
+Median fraction of reciprocal arcs: 0.951
+Trips whose route has disconnected consecutive arcs: 11
+Total disconnected route steps: 14 of 34723
+Weak components (median/max): 19.0/421
+
+Issues:
+   partition  trip_id             issues
+       train 00000013 arcs: 2 self-loops
+       train 00000024 arcs: 2 self-loops
+       train 00000035 arcs: 2 self-loops
+       train 00000038 arcs: 2 self-loops
+       train 00000055 arcs: 8 self-loops
+       train 00000079 arcs: 2 self-loops
+       train 00000084 arcs: 2 self-loops
+       train 00000099 arcs: 2 self-loops
+student_test 00000091 arcs: 2 self-loops

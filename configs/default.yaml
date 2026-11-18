@@ -1,0 +1,23 @@
+# PathSnap configuration. All paths are relative to the repository root.
+data_root: "../Student folder"      # contains train/ and student_test/ (not committed)
+partitions:
+  train: train
+  student_test: student_test
+
+geo:
+  crs: auto                         # per-trip UTM zone (trips are worldwide; see docs/decisions.md)
+
+labels:
+  method: monotonic                 # monotonic | nearest  (see docs/decisions.md)
+  ambiguous_distance_m: 30.0        # aligned arc farther than this -> ambiguous
+
+candidates:
+  radius_m: 50.0
+  max_k: 12
+  sample_step_m: 10.0               # densification step for the spatial index
+
+gaps:
+  large_gap_s: 10.0                 # time gap treated as "large"
+
+seed: 42
+cv_folds: 5

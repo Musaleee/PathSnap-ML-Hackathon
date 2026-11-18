@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+# raw data and caches are never committed
+data/
+Student folder/
+*.zip
+experiments/cache/
+# large candidate models (>30 MB) are not committed; rebuild with `python -m pathsnap.train`
+artifacts/candidates/random_forest.joblib
+artifacts/candidates/extra_trees.joblib
+artifacts/candidates/knn.joblib
+.pytest_cache/

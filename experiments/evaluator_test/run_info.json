@@ -1,0 +1,38 @@
+{
+ "purpose": "test-only evaluation of pre-trained models; no fitting, no tuning on this data",
+ "data_folder_name": "evaluator_test",
+ "trips": [
+  "00000015",
+  "00000017",
+  "00000023",
+  "00000030",
+  "00000049",
+  "00000059",
+  "00000067",
+  "00000073",
+  "00000087",
+  "00000094"
+ ],
+ "n_points": 19674,
+ "n_candidate_rows": 146494,
+ "ambiguous_frac": 0.09022059571007421,
+ "miss_rate_evaluable": 0.0007934452585102611,
+ "models_dir": "artifacts/candidates",
+ "config": {
+  "labels": {
+   "method": "monotonic",
+   "ambiguous_distance_m": 30.0
+  },
+  "candidates": {
+   "radius_m": 50.0,
+   "max_k": 12,
+   "sample_step_m": 10.0
+  }
+ },
+ "environment": {
+  "python": "3.9.6",
+  "sklearn": "1.6.1",
+  "machine": "arm64"
+ },
+ "timestamp": "2026-11-18T15:19:21"
+}

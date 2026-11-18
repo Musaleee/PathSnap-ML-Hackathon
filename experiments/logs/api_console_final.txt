@@ -1,0 +1,20 @@
+2026-11-18 16:15:43,013 | INFO | model loaded from hist_gb_tuned.joblib in 0.15 s; HMM HMMParams(beta=5.0, emission_weight=0.5, gap_break_s=60.0, route_factor=2.0, slack_m=200.0, max_search_m=5000.0, back_tol_m=15.0); data folder <project>/Student folder/student_test
+INFO:     Started server process [11675]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+2026-11-18 16:15:48,149 | INFO | GET /health from 127.0.0.1 -> 200 in 1 ms
+INFO:     127.0.0.1:50006 - "GET /health HTTP/1.1" 200 OK
+2026-11-18 16:15:54,209 | INFO | GET /health from 127.0.0.1 -> 200 in 1 ms
+INFO:     127.0.0.1:50012 - "GET /health HTTP/1.1" 200 OK
+2026-11-18 16:15:54,226 | INFO | GET /trips from 127.0.0.1 -> 200 in 1 ms
+INFO:     127.0.0.1:50012 - "GET /trips HTTP/1.1" 200 OK
+2026-11-18 16:16:00,930 | INFO | OPTIONS /predict from 127.0.0.1 -> 200 in 0 ms
+INFO:     127.0.0.1:50014 - "OPTIONS /predict HTTP/1.1" 200 OK
+2026-11-18 16:16:01,545 | INFO | trip 00000076: 1486 points, 406 route arcs, metrics {'n_evaluable': 1449, 'top1_hmm': 0.9821, 'top1_classifier_only': 0.9572, 'route_continuity': 0.9758, 'route_precision': 0.9179, 'route_recall': 0.9866, 'route_f1': 0.951, 'route_norm_edit': 0.0911}, predict 0.56 s
+2026-11-18 16:16:01,551 | INFO | POST /predict from 127.0.0.1 -> 200 in 612 ms
+INFO:     127.0.0.1:50014 - "POST /predict HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [11675]

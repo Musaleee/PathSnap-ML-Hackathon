@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PathSnap Evaluator</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root { --ink:#1b2333; --soft:#5b6578; --line:#d8dce3; --bg:#f6f7f9; --card:#fff; --acc:#d62728; --gps:#1f77b4; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.45 -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink); background:var(--bg); }
+  header { padding:12px 16px; background:var(--ink); color:#fff; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:18px; margin:0 12px 0 0; }
+  header input { width:260px; max-width:100%; padding:6px 8px; border-radius:6px; border:0; }
+  button { padding:6px 12px; border-radius:6px; border:1px solid var(--line); background:#fff; cursor:pointer; font:inherit; }
+  button.primary { background:var(--acc); color:#fff; border-color:var(--acc); }
+  button:disabled { opacity:.5; cursor:default; }
+  main { display:grid; grid-template-columns: 300px 1fr; gap:12px; padding:12px; height:calc(100vh - 56px); }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; overflow:auto; }
+  #map { border-radius:10px; border:1px solid var(--line); min-height:400px; }
+  #trips button { display:block; width:100%; text-align:left; margin-bottom:6px; font-family:ui-monospace, Menlo, monospace; }
+  #trips button.sel { border-color:var(--acc); background:#fdecec; }
+  table { width:100%; border-collapse:collapse; margin-top:6px; }
+  td { padding:3px 0; border-bottom:1px solid #eef0f3; } td:last-child { text-align:right; font-variant-numeric:tabular-nums; }
+  h2 { font-size:14px; margin:14px 0 4px; color:var(--soft); text-transform:uppercase; letter-spacing:.05em; }
+  #status { font-size:13px; color:#cfd6e4; }
+  .err { color:#b00020; font-weight:600; }
+  .legend span { display:inline-block; width:16px; height:4px; margin-right:6px; vertical-align:middle; }
+  @media (max-width: 760px) { main { grid-template-columns:1fr; height:auto; } #map { height:60vh; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>PathSnap Evaluator</h1>
+  <label>API <input id="api" value="http://localhost:8000"></label>
+  <button id="connect">Connect</button>
+  <span id="status">not connected</span>
+</header>
+<main>
+  <section class="panel">
+    <h2>Trips on server</h2>
+    <div id="trips"><em>Connect to load trips.</em></div>
+    <button class="primary" id="run" disabled>Predict selected trip</button>
+    <div id="msg"></div>
+    <h2>Evaluation (computed by the API)</h2>
+    <table id="metrics"></table>
+    <h2>Timings</h2>
+    <table id="timings"></table>
+    <h2>Legend</h2>
+    <div class="legend"><div><span style="background:var(--gps)"></span>Raw GPS observations</div>
+      <div><span style="background:var(--acc)"></span>Predicted route (classifier + HMM)</div></div>
+  </section>
+  <div id="map"></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let selected = null;
+try { const s = localStorage.getItem('pathsnap_api'); if (s) $('api').value = s; } catch (e) {}
+const map = L.map('map').setView([20, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+let gpsLayer = L.layerGroup().addTo(map), routeLayer = L.layerGroup().addTo(map);
+L.control.layers(null, { 'Raw GPS': gpsLayer, 'Predicted route': routeLayer }, { collapsed: false }).addTo(map);
+
+const api = () => $('api').value.replace(/\/+$/, '');
+function msg(t, err) { $('msg').innerHTML = t ? `<p class="${err ? 'err' : ''}">${t}</p>` : ''; }
+
+async function call(path, opts) {
+  const r = await fetch(api() + path, opts);
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(body.detail || `HTTP ${r.status}`);
+  return body;
+}
+
+$('connect').onclick = async () => {
+  try { localStorage.setItem('pathsnap_api', $('api').value); } catch (e) {}
+  $('status').textContent = 'connecting…';
+  try {
+    const h = await call('/health');
+    const t = await call('/trips');
+    $('status').textContent = `connected · model ${h.model} · ${h.n_trips} trips`;
+    $('trips').innerHTML = '';
+    t.trips.forEach(id => {
+      const b = document.createElement('button'); b.textContent = id;
+      b.onclick = () => { selected = id; [...$('trips').children].forEach(x => x.classList.toggle('sel', x === b)); $('run').disabled = false; };
+      $('trips').appendChild(b);
+    });
+    if (!t.trips.length) $('trips').innerHTML = '<em>No trips found on the server.</em>';
+  } catch (e) { $('status').textContent = 'not connected'; msg(`Cannot reach the API at ${api()}: ${e.message}`, true); }
+};
+
+const fmt = v => v === null || v === undefined ? 'N/A' : (typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(4) : v);
+function table(el, rows) { el.innerHTML = rows.map(([k, v]) => `<tr><td>${k}</td><td>${fmt(v)}</td></tr>`).join(''); }
+
+$('run').onclick = async () => {
+  if (!selected) return;
+  $('run').disabled = true; msg(`Predicting ${selected}…`);
+  const t0 = performance.now();
+  try {
+    const r = await call('/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trip_id: selected }) });
+    const rtt = (performance.now() - t0) / 1000;
+    gpsLayer.clearLayers(); routeLayer.clearLayers();
+    const step = Math.max(1, Math.floor(r.gps.length / 3000));
+    r.gps.forEach(([lon, lat], i) => { if (i % step === 0) L.circleMarker([lat, lon], { radius: 2, color: '#1f77b4', weight: 0, fillOpacity: .7 }).addTo(gpsLayer); });
+    const route = L.geoJSON(r.predicted_route_geojson, { style: { color: '#d62728', weight: 4, opacity: .9 } }).addTo(routeLayer);
+    const b = L.latLngBounds(r.gps.map(([lon, lat]) => [lat, lon]));
+    map.fitBounds(b, { padding: [20, 20] });
+    const m = r.metrics || {};
+    table($('metrics'), [['Trip', r.trip_id], ['GPS points', r.n_points], ['Points without candidates', r.n_points_without_candidates],
+      ['Evaluable points', m.n_evaluable], ['Top-1 accuracy (HMM)', m.top1_hmm], ['Top-1 (classifier only)', m.top1_classifier_only],
+      ['Route continuity', m.route_continuity], ['Route precision', m.route_precision], ['Route recall', m.route_recall],
+      ['Route F1', m.route_f1], ['Normalised edit distance', m.route_norm_edit], ['Chain breaks (gaps)', r.chain_breaks]]);
+    table($('timings'), [...Object.entries(r.timings), ['round trip (UI) s', rtt]]);
+    msg(r.metrics ? '' : 'No reference available on the server for this trip, so no metrics.');
+  } catch (e) { msg(`Prediction failed: ${e.message}`, true); }
+  $('run').disabled = false;
+};
+</script>
+</body>
+</html>

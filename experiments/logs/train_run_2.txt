@@ -1,0 +1,33 @@
+train rows 1,342,864  student-test rows 146,925
+
+=== 20261118-110442-random_forest (Ensemble (bagging)) ===
+  fold 0: top1 0.9475 macroF1 0.9638 logloss 0.0440 fit 18.5s
+  fold 1: top1 0.9260 macroF1 0.9503 logloss 0.0611 fit 20.2s
+  fold 2: top1 0.9352 macroF1 0.9557 logloss 0.0506 fit 20.3s
+  fold 3: top1 0.9149 macroF1 0.9444 logloss 0.0755 fit 17.6s
+  fold 4: top1 0.9237 macroF1 0.9515 logloss 0.0556 fit 18.9s
+  student-test: top1 0.9319 macroF1 0.9559 logloss 0.0500 continuity 0.9632
+
+=== 20261118-110647-extra_trees (Ensemble (randomised trees)) ===
+  fold 0: top1 0.9417 macroF1 0.9553 logloss 0.0629 fit 6.6s
+  fold 1: top1 0.9192 macroF1 0.9404 logloss 0.0775 fit 7.4s
+  fold 2: top1 0.9327 macroF1 0.9493 logloss 0.0667 fit 7.6s
+  fold 3: top1 0.9115 macroF1 0.9387 logloss 0.0941 fit 6.6s
+  fold 4: top1 0.9189 macroF1 0.9464 logloss 0.0736 fit 7.4s
+  student-test: top1 0.9209 macroF1 0.9472 logloss 0.0674 continuity 0.9632
+
+=== 20261118-110736-mlp (Neural network) ===
+  fold 0: top1 0.9485 macroF1 0.9636 logloss 0.0456 fit 11.1s
+  fold 1: top1 0.9258 macroF1 0.9474 logloss 0.0675 fit 11.1s
+  fold 2: top1 0.9315 macroF1 0.9517 logloss 0.0558 fit 11.2s
+  fold 3: top1 0.9247 macroF1 0.9477 logloss 0.0763 fit 9.1s
+  fold 4: top1 0.9246 macroF1 0.9503 logloss 0.0631 fit 6.8s
+  student-test: top1 0.9274 macroF1 0.9509 logloss 0.0555 continuity 0.9685
+
+=== 20261118-110834-knn (Instance-based) ===
+  fold 0: top1 0.9259 macroF1 0.9414 logloss 0.0836 fit 0.2s
+  fold 1: top1 0.9080 macroF1 0.9308 logloss 0.1035 fit 0.2s
+  fold 2: top1 0.9189 macroF1 0.9385 logloss 0.0936 fit 0.2s
+  fold 3: top1 0.9031 macroF1 0.9288 logloss 0.1355 fit 0.2s
+  fold 4: top1 0.9011 macroF1 0.9270 logloss 0.1088 fit 0.3s
+  student-test: top1 0.9073 macroF1 0.9357 logloss 0.0955 continuity 0.9690

@@ -1,0 +1,20 @@
+model params: {'learning_rate': 0.09712602008407221, 'max_leaf_nodes': 239, 'max_depth': None, 'min_samples_leaf': 14, 'l2_regularization': 0.9898489457706215, 'max_features': 0.6276116795931186, 'max_iter': 500}
+precompute 16 s
+beta 2 w 0.5: top1 0.9484 continuity 0.9860
+beta 2 w 1.0: top1 0.9495 continuity 0.9859
+beta 2 w 2.0: top1 0.9483 continuity 0.9857
+beta 5 w 0.5: top1 0.9496 continuity 0.9859
+beta 5 w 1.0: top1 0.9483 continuity 0.9856
+beta 5 w 2.0: top1 0.9473 continuity 0.9850
+beta 10 w 0.5: top1 0.9483 continuity 0.9856
+beta 10 w 1.0: top1 0.9473 continuity 0.9850
+beta 10 w 2.0: top1 0.9459 continuity 0.9842
+beta 20 w 0.5: top1 0.9473 continuity 0.9850
+beta 20 w 1.0: top1 0.9459 continuity 0.9842
+beta 20 w 2.0: top1 0.9451 continuity 0.9835
+beta 50 w 0.5: top1 0.9460 continuity 0.9839
+beta 50 w 1.0: top1 0.9447 continuity 0.9833
+beta 50 w 2.0: top1 0.9436 continuity 0.9827
+selected {'beta': 5.0, 'emission_weight': 0.5, 'gap_break_s': 60.0, 'route_factor': 2.0, 'slack_m': 200.0, 'max_search_m': 5000.0, 'back_tol_m': 15.0}
+classifier_only {'decoder': 'classifier_only', 'partition': 'student_test', 'top1': np.float64(0.937328105799052), 'continuity': np.float64(0.9723759791122716), 'chain_breaks': 0, 'decode_s_per_trip': np.float64(0.0012927293777465821), 'route_precision': np.float64(0.7140373384353703), 'route_recall': np.float64(0.9934324896239002), 'route_f1': np.float64(0.8235471106668181), 'route_norm_edit': np.float64(0.5762443379023707), 'route_gaps': 137}
+classifier_hmm {'decoder': 'classifier_hmm', 'partition': 'student_test', 'top1': np.float64(0.9515477792732167), 'continuity': np.float64(0.984490861618799), 'chain_breaks': 8, 'decode_s_per_trip': np.float64(0.020794177055358888), 'route_precision': np.float64(0.9465562414137638), 'route_recall': np.float64(0.9910141848706756), 'route_f1': np.float64(0.9677963098434805), 'route_norm_edit': np.float64(0.09902038763346083), 'route_gaps': 0}
