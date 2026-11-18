@@ -10,7 +10,7 @@ PathSnap matches noisy GPS trajectories to a directed road network. The pipeline
 | Guide | File |
 |---|---|
 | Run in VS Code, step by step | `RUN_LOCALLY.md` |
-| **Demo on this laptop** | `DEMO.md` |
+| **Demo (two laptops)** | `DEMO.md` |
 | Two-laptop deployment | `docs/deployment.md` |
 | API fields | `docs/api_contract.md` |
 | Decisions | `docs/decisions.md` |

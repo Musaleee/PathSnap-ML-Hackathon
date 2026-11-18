@@ -57,6 +57,8 @@
 const $ = id => document.getElementById(id);
 let selected = null;
 try { const s = localStorage.getItem('pathsnap_api'); if (s) $('api').value = s; } catch (e) {}
+const qp = new URLSearchParams(location.search).get('api');   // e.g. index.html?api=http://10.0.0.5:8000
+if (qp) $('api').value = qp;
 const map = L.map('map').setView([20, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
 let gpsLayer = L.layerGroup().addTo(map), routeLayer = L.layerGroup().addTo(map);

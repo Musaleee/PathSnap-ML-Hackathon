@@ -1,49 +1,74 @@
-# Demo on one laptop (macOS)
+# Two-laptop demo
 
-Folder layout on this Mac:
-```
-ML_Hackathon/
-├── pathsnap/                      ← this repo (with .venv)
-└── evaluator_data/evaluator_test/ ← the 10 evaluation trips (not in git)
-```
+| | Laptop 1: backend (this Mac) | Laptop 2: user interface |
+|---|---|---|
+| Runs | FastAPI + model + HMM + evaluator trips | The UI web page only |
+| Terminal shows | One log line per request (method, client IP, status, latency, trip metrics) | The page requests from the browser |
+| Needs | The repo with `.venv`, and `../evaluator_data/evaluator_test/` | Python 3 (any) and a browser. Internet is only needed for map tiles |
 
-## Start (two terminals, about 10 seconds)
+Both laptops must be on the **same Wi-Fi**. If the venue Wi-Fi blocks laptops from talking to each other, connect both to one phone hotspot.
 
-**Terminal 1: API.** Keep it on screen, because the evaluator must see the request logs.
-```bash
-cd ~/Documents/ML_Hackathon/pathsnap && scripts/demo_api.sh
-```
-Wait for `Uvicorn running on http://127.0.0.1:8000`.
+Rules from the organisers: everything runs in the terminal, and you must not kill any process during the evaluation. So **start both servers before the evaluator arrives and leave them running**. Close nothing until the evaluation is over.
 
-**Terminal 2: UI.** This also opens http://localhost:5500 in the browser.
-```bash
-cd ~/Documents/ML_Hackathon/pathsnap && scripts/demo_ui.sh
-```
+---
 
-Another trips folder: `scripts/demo_api.sh /path/to/folder`.
-To use a second laptop for the UI: `HOST=0.0.0.0 scripts/demo_api.sh`.
+## Laptop 1: backend
 
-## What to show (about 5 minutes)
-
-1. **UI:** the API box says `http://localhost:8000`. Click **Connect**. The status shows the model `hist_gb_tuned.joblib` and 10 trips.
-2. Pick any trip and click **Predict selected trip**.
-   - The map shows the raw GPS (blue dots) and the predicted route (red line). Use the layer switch to toggle them.
-   - The panel shows the metrics computed by the API: Top-1 with HMM and with the classifier alone, route continuity, precision, recall, F1 and edit distance, plus timings.
-3. **Terminal 1:** point to the log lines for that request:
+1. Open a terminal:
+   ```bash
+   cd ~/Documents/ML_Hackathon/pathsnap && HOST=0.0.0.0 scripts/demo_api.sh
    ```
-   POST /predict from 127.0.0.1 -> 200 in … ms
+   Wait for `Uvicorn running on http://0.0.0.0:8000`.
+2. Find this laptop's IP address in a **second** terminal. Leave the first one alone.
+   ```bash
+   ipconfig getifaddr en0
+   ```
+   On 18 Nov at the hackathon venue it was `10.20.201.72`. **It can change** when the network changes, so check it on the day.
+3. Check from Laptop 1: `curl http://<IP>:8000/health` should print `"status":"ok"` with `"n_trips":10`.
+4. Leave terminal 1 on screen. This is where the evaluator sees the API logs.
+
+## Laptop 2: user interface
+
+1. Get the code. Only the `ui/` folder is needed:
+   ```bash
+   git clone https://github.com/Musaleee/PathSnap-ML-Hackathon.git
+   cd PathSnap-ML-Hackathon
+   ```
+   Or copy the `ui/` folder over on a USB stick.
+2. Start the UI in a terminal, using Laptop 1's IP:
+   - macOS / Linux:
+     ```bash
+     scripts/demo_ui.sh http://<IP>:8000
+     ```
+   - Windows:
+     ```bat
+     scripts\demo_ui.bat http://<IP>:8000
+     ```
+   The browser opens with the API address already filled in. If not, open `http://localhost:5500` and type `http://<IP>:8000` in the API box.
+3. Leave this terminal running too.
+
+## What to show the evaluator
+
+1. On Laptop 2, click **Connect**. The status shows `connected · model hist_gb_tuned.joblib · 10 trips`.
+2. The evaluator picks any trip and clicks **Predict selected trip**.
+   - The map shows the raw GPS (blue) and the predicted route (red). Use the layer switch at the top right to toggle them.
+   - The panel shows the metrics computed **by the API**: Top-1 with HMM and with the classifier alone, route continuity, precision, recall, F1, edit distance and timings.
+3. On Laptop 1, point to the new log lines. They show Laptop 2's IP as the client:
+   ```
+   POST /predict from <laptop-2-ip> -> 200 in … ms
    trip 000000xx: … points, … route arcs, metrics {...}
    ```
-4. Repeat with 2–3 more trips. All 10 work, each in under 1 second.
-5. **Ground truth stays on the server.**
-   - Inference never reads `.route`. The server reads it only afterwards, to score.
-   - The response has no reference route. If asked, show this live:
+4. Repeat with any other trips. All 10 work, each in under 1 second.
+5. **Ground truth never leaves Laptop 1.**
+   - Inference does not read `.route`. The server reads it only after predicting, to score.
+   - The response contains no reference route.
+   - If asked, prove it in a **new** terminal on Laptop 1, without touching the running ones:
      ```bash
-     curl -s -X POST localhost:8000/predict -H 'Content-Type: application/json' -d '{"trip_id":"00000049"}' | python3 -m json.tool | head -40
+     cd ~/Documents/ML_Hackathon/pathsnap && PYTHONPATH=src .venv/bin/python -m pytest -q tests
      ```
-   - The automated proof is `PYTHONPATH=src .venv/bin/python -m pytest -q tests` (17 tests, including the leak test).
+     All 17 tests pass, including the leak test. The tests use their own in-process copy of the API, so they do not disturb the running server.
 
-Expected results (evaluator run, `experiments/evaluator_test_final/RESULTS.md`):
+Expected results (`experiments/evaluator_test_final/RESULTS.md`):
 
 | Trip | Top-1 (HMM) | Route F1 |
 |---|---|---|
@@ -60,19 +85,14 @@ Expected results (evaluator run, `experiments/evaluator_test_final/RESULTS.md`):
 
 Overall: Top-1 0.962 (classifier alone 0.928), route F1 0.953.
 
-## Extra things to have open
-- Folium maps with the reference route (offline mode only): `maps/student_test_00000077.html`, `maps/eda_train_00000001.html`
-- Results: `reports/report_tables.md`
-- Decisions: `docs/decisions.md`
-
-## If something goes wrong
+## Troubleshooting (without stopping anything)
 
 | Problem | Fix |
 |---|---|
-| UI shows "Cannot reach the API" | Check that terminal 1 is running and the API box says `http://localhost:8000`, then click Connect again |
-| `Address already in use` | Something is already on the port. Run `lsof -ti:8000 \| xargs kill` (or `:5500`), then start again |
-| Map is grey | No internet, so map tiles can't load. The route still draws, and the metrics still show |
-| `Trips folder not found` | Pass the folder: `scripts/demo_api.sh ../evaluator_data/evaluator_test` |
-| `No module named …` | Run `.venv/bin/pip install -r requirements.txt` |
+| UI: "Cannot reach the API" | Check the IP in the API box and click Connect again. From Laptop 2, `curl http://<IP>:8000/health` should answer. If it doesn't, the Wi-Fi is isolating devices, so use a phone hotspot for both laptops |
+| macOS asks "accept incoming connections?" for Python | Click **Allow** |
+| Windows firewall prompt on Laptop 2 | Allow, on private networks |
+| Map is grey | No internet on Laptop 2, so tiles can't load. The route line and metrics still show |
+| Port 8000 / 5500 already in use (only at start-up) | Use another port: `PORT=8001 HOST=0.0.0.0 scripts/demo_api.sh` and put `:8001` in the UI |
 
-To stop: press Ctrl+C in both terminals.
+Single-laptop rehearsal: run `scripts/demo_api.sh` and `scripts/demo_ui.sh` on one machine (API box `http://localhost:8000`).
