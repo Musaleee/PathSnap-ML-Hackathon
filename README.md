@@ -99,7 +99,7 @@ python -m pytest -q tests            # API tests, including the ground-truth lea
 | Bharat V Bhat | PES1UG24CS113 |
 | Bharath Hegde | PES1UG24CS114 |
 
-Technical report: `reports/PathSnap_Team26_Report.pdf` (source `reports/PathSnap_Report.md`, rebuilt with `python -m pathsnap.report_pdf`).
+Technical report: `reports/PathSnap_Team26_Report.docx` (Word) and `reports/PathSnap_Team26_Report.pdf`. Source: `reports/PathSnap_Report.md`; rebuild with `python -m pathsnap.report_pdf` then `python -m pathsnap.report_docx`.
 
 ## AI-use disclosure
 The following were drafted with an AI assistant (Claude, Anthropic):
